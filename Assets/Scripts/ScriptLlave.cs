@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class ScriptLlave : MonoBehaviour
 {
-    public GameObject arbol;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,10 +19,10 @@ public class ScriptLlave : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        SpriteRenderer dibujo = GetComponent<SpriteRenderer>();
-        if(arbol != null)
+        if(collision.CompareTag("Player"))
         {
-            arbol.SetActive(false);
+            collision.gameObject.GetComponent<Gato>().tieneLlave = true;
+            Destroy(gameObject);
         }
     }
 }

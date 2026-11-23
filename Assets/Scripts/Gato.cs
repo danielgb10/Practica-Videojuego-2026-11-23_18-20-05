@@ -15,6 +15,7 @@ public class Gato : MonoBehaviour
     public Vector2 tamanoCaja;
     private int monedas; //contador monedas
     public TMP_Text texoMonedas;
+    public bool tieneLlave = false;
     SpriteRenderer sprite;
     Animator anim;
 
@@ -100,7 +101,6 @@ public class Gato : MonoBehaviour
         if(Input.GetKey(KeyCode.F))
         {
             anim.SetTrigger("Atacar");
-            Destroy(gameObject);
         }
         else
         {
