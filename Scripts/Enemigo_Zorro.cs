@@ -28,11 +28,6 @@ public class Enemigo_Zorro : MonoBehaviour
     {
         MoverZorro();
         ActualizarTemporizador();
-
-        if (DetectarJugador())
-        {
-
-        }
     }
 
     private void MoverZorro()
@@ -72,10 +67,13 @@ public class Enemigo_Zorro : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-        atacando = true;
+            atacando = true;
             anim.SetTrigger("Atacar");
+
+            FindObjectOfType<GanarPerder>().Derrota();
+
+            collision.gameObject.SetActive(false);
         }
-        Debug.Log("Enemigo atacando");
     }
 
     private bool DetectarJugador()

@@ -35,8 +35,21 @@ public class Gato : MonoBehaviour
         LeerMovimiento();
         LeerSalto();
         ActualizarAnim();
-        LeerAtaque();
+        //LeerAtaque();
         //EstaEnElSuelo();
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            FindObjectOfType<GanarPerder>().Derrota();
+        }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            FindObjectOfType<GanarPerder>().Victoria();
+        }
+    }
+
+    public int Monedas()
+    {
+        return monedas;
     }
 
     private void ActualizarAnim()
@@ -138,15 +151,30 @@ void LeerMovimiento()
     {
         if (collision.CompareTag("Agua"))
         {
-            Destroy(gameObject);
+            FindObjectOfType<GanarPerder>().Derrota();
+            gameObject.SetActive(false);
         }
 
         if (collision.CompareTag("Pinchos"))
         {
-            Destroy(gameObject);
+            FindObjectOfType<GanarPerder>().Derrota();
+            gameObject.SetActive(false);
         }
 
-        if (collision.CompareTag("Moneda"))
+        if (collision.CompareTag("Meta"))
+        {
+            movimiento = Vector3.zero;
+            anim.SetTrigger("Victoria");
+
+            Invoke(nameof(MostrarVictoria), 2f);
+        }
+
+        void MostrarVictoria()
+        {
+            FindObjectOfType<GanarPerder>().Victoria();
+        }
+
+        if (collision.gameObject.CompareTag("Moneda"))
         {
             Destroy(collision.gameObject);
             monedas++;
