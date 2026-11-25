@@ -153,8 +153,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 06a75809ebfa3f74a9a59d8e0519dc37
-      internalID: -1373434884
+      spriteID: 4e5e8c7ddae0976478fd3526367487c3
+      internalID: -2076718567
       vertices: []
       indices: 
       edges: []
@@ -174,8 +174,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1da86ae70b94fbb4eaf36bdc3df9604a
-      internalID: 1073580520
+      spriteID: 70123d2f63baa254c8ec5aeeeb168ca9
+      internalID: 1833793919
       vertices: []
       indices: 
       edges: []
@@ -193,8 +193,8 @@ TextureImporter:
     nameFileIdTable:
       Cat_attack_1_0: -854589085
       Cat_attack_1_1: -1532810925
-      Cat_attack_1_2: -1373434884
-      Cat_attack_1_3: 1073580520
+      Cat_attack_1_2: -2076718567
+      Cat_attack_1_3: 1833793919
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

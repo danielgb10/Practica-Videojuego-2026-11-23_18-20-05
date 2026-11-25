@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 
 public class Gato : MonoBehaviour
 {
@@ -21,13 +23,18 @@ public class Gato : MonoBehaviour
 
     public int vida = 3;
     private Vector2 knockBack;
+    public Notification notificacion;
+    public int llaves;
+    public TMP_Text textoLlave;
 
     void Start()
     {
+
         movimiento = new Vector3();
         cuerpo = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+
     }
 
     void Update()
@@ -36,12 +43,20 @@ public class Gato : MonoBehaviour
         LeerSalto();
         ActualizarAnim();
         LeerAtaque();
-        //RotarPersonaje();
+        EstaEnElSuelo();
     }
 
-    private void ActualizarAnim()
+  private void ActualizarAnim()
     {
-        anim.SetBool("Correr", movimiento.x != 0);
+        if(movimiento.x == 0)
+        {
+            anim.SetBool("Correr", false);
+            
+        } else
+        {
+            anim.SetBool("Correr", true);
+        }
+
     }
 
     void LeerMovimiento()
@@ -61,50 +76,49 @@ public class Gato : MonoBehaviour
             movimiento = Vector3.zero;
         }
     }
-
-   /* private void RotarPersonaje()
+     void LeerSalto()
     {
-        if(movimiento.x < 0)
+        if (Input.GetKey(KeyCode.Space))
         {
-            gameObject.transform.rotation = new Quaternion(0, 180, 0, 0);
+            saltando = true;
         }
-        else if(movimiento.x > 0)
+        else
         {
-            gameObject.transform.rotation = new Quaternion(0, 0, 0, 0);
-        }
-    }*/
-
-    void FixedUpdate()
-    {
-        cuerpo.velocity = new Vector2(
-            movimiento.x * velocidad,
-            cuerpo.velocity.y
-        );
-
-        if (saltando)
-        {
-            cuerpo.AddForce(Vector2.up * fuerzaSalto);
             saltando = false;
         }
     }
 
-    void LeerSalto()
+    void FixedUpdate()
+ {
+     cuerpo.velocity = new Vector2(
+         movimiento.x * velocidad,
+         cuerpo.velocity.y
+     );
+     if(saltando)
+     {
+         cuerpo.AddForce(Vector2.up * fuerzaSalto);
+         saltando = false;
+     }
+ }
+
+    bool EstaEnElSuelo()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            saltando = true;
-        }
+        RaycastHit2D rc = Physics2D.BoxCast(transform.position, tamanoCaja, 0, Vector2.down, distCaja, capaSuelo);
+        if (rc)
+    {
+        return true;
     }
+    else
+    {
+        return false;
+    }
+}
 
     private void LeerAtaque()
     {
-        if(Input.GetKey(KeyCode.F))
+        if(Input.GetKeyDown(KeyCode.F))
         {
             anim.SetTrigger("Atacar");
-        }
-        else
-        {
-            anim.ResetTrigger("Atacar");
         }
     }
 
@@ -126,10 +140,21 @@ public class Gato : MonoBehaviour
             monedas++;
             texoMonedas.text = monedas.ToString();
         }
-        
+
+       if (collision.CompareTag("Agua"))
+        {
+            anim.SetTrigger("Muere");
+
+            cuerpo.simulated = false;
+
+        }
+
+        if (collision.CompareTag("Meta"))
+        {
+            anim.SetTrigger("Ganar");
+        }
+
     }
-    
-    
 
-
+  
 }

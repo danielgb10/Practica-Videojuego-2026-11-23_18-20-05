@@ -33,8 +33,6 @@ public class ScriptArbol : MonoBehaviour
                 if(!dentro)
                 {
                     dentro = true;
-                    Debug.Log("Entrando");
-                    Debug.Log(puntoSalida.position);
                     collision.gameObject.transform.position = puntoSalida.position;
 
                Camera.main.transform.position = new Vector3(

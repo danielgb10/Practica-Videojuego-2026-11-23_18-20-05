@@ -71,6 +71,7 @@ public class Enemigo_Zorro : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             anim.SetTrigger("Atacar");
+            Destroy(collision.gameObject);
         }
         Debug.Log("Enemigo atacando");
     }

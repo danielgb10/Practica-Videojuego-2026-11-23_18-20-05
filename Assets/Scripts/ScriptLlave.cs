@@ -1,10 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class ScriptLlave : MonoBehaviour
 {
+    private int llave;
+    public TMP_Text textoLlave;
+    public GameObject texto;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,12 +22,13 @@ public class ScriptLlave : MonoBehaviour
         
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if(collision.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            collision.gameObject.GetComponent<Gato>().tieneLlave = true;
+            texto.SetActive(true);
+            Destroy(texto, 2f);
             Destroy(gameObject);
         }
-    }
+    }   
 }
