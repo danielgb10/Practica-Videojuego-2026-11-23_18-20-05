@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class Enemigo_Zorro : MonoBehaviour
 {
-    /*public Vector3 movimiento;
-    SpriteRenderer sprite;*/
     public float tiempoPatrulla;
     public float velocidad = 2f;
     private bool derecha = true;
@@ -13,7 +11,6 @@ public class Enemigo_Zorro : MonoBehaviour
     public Vector2 tamannoAtaque;
     public float distanciaAtaque;
     public LayerMask capaJugador;
-    Rigidbody2D cuerpo;
     GameObject aGolpear;
     Animator anim;
     private bool atacando = false;
@@ -68,13 +65,12 @@ public class Enemigo_Zorro : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             atacando = true;
+
             anim.SetTrigger("Atacar");
 
-            FindObjectOfType<GanarPerder>().Derrota();
-
-            collision.gameObject.SetActive(false);
+            collision.gameObject.GetComponent<Gato>().Morir();
         }
-    }
+}
 
     private bool DetectarJugador()
     {

@@ -37,14 +37,6 @@ public class Gato : MonoBehaviour
         ActualizarAnim();
         //LeerAtaque();
         //EstaEnElSuelo();
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            FindObjectOfType<GanarPerder>().Derrota();
-        }
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            FindObjectOfType<GanarPerder>().Victoria();
-        }
     }
 
     public int Monedas()
@@ -151,14 +143,12 @@ void LeerMovimiento()
     {
         if (collision.CompareTag("Agua"))
         {
-            FindObjectOfType<GanarPerder>().Derrota();
-            gameObject.SetActive(false);
+            Morir();
         }
 
         if (collision.CompareTag("Pinchos"))
         {
-            FindObjectOfType<GanarPerder>().Derrota();
-            gameObject.SetActive(false);
+            Morir();
         }
 
         if (collision.CompareTag("Meta"))
@@ -169,17 +159,28 @@ void LeerMovimiento()
             Invoke(nameof(MostrarVictoria), 2f);
         }
 
-        void MostrarVictoria()
-        {
-            FindObjectOfType<GanarPerder>().Victoria();
-        }
-
         if (collision.gameObject.CompareTag("Moneda"))
         {
             Destroy(collision.gameObject);
             monedas++;
             texoMonedas.text = monedas.ToString();
         }
+    }
+    void MostrarVictoria()
+    {
+        FindObjectOfType<GanarPerder>().Victoria();
+    }
+    public void Morir()
+    {
+        movimiento = Vector3.zero;
+
+        anim.SetTrigger("Derrota");
+
+        Invoke(nameof(MostrarDerrota), 2f);
+    }
+    void MostrarDerrota()
+    {
+        FindObjectOfType<GanarPerder>().Derrota();
     }
 
 }

@@ -20,7 +20,7 @@ public class SeguirGato : MonoBehaviour
         Vector3 posVieja = transform.position;
         Vector3 posNueva = new Vector3(
             Mathf.Lerp(posVieja.x, posDestino.x, 5 * Time.deltaTime),
-            posVieja.y,//Mathf.Lerp(posVieja.y, posDestino.y, 5 * Time.deltaTime),
+            posVieja.y,
             posVieja.z
         );
         transform.position = posNueva;
