@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Gato : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class Gato : MonoBehaviour
     public float velocidad;
     bool saltando;
     public float fuerzaSalto;
+    private float velocidadOriginal;
+    private float saltoOriginal;
     public LayerMask capaSuelo;
     public float distCaja;
     public Vector2 tamanoCaja;
@@ -19,15 +22,26 @@ public class Gato : MonoBehaviour
     SpriteRenderer sprite;
     Animator anim;
 
-    public int vida = 3;
+    public int vidaMax;
+    int vidaRestante;
+
+    public Image corazon1;
+    public Image corazon2;
+    public Image corazon3;
+
     private Vector2 knockBack;
 
     void Start()
     {
+        knockBack = Vector2.zero;
+        vidaRestante = vidaMax;
         movimiento = new Vector3();
         cuerpo = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        velocidadOriginal = velocidad;
+        saltoOriginal = fuerzaSalto;
+        ActualizarCorazones();
     }
 
     void Update()
@@ -35,8 +49,8 @@ public class Gato : MonoBehaviour
         LeerMovimiento();
         LeerSalto();
         ActualizarAnim();
-        //LeerAtaque();
         //EstaEnElSuelo();
+        LeerAtaque();
     }
 
     public int Monedas()
@@ -64,8 +78,13 @@ public class Gato : MonoBehaviour
         }
 
     }
-
-void LeerMovimiento()
+    void ActualizarCorazones()
+    {
+        corazon1.enabled = vidaMax >= 1;
+        corazon2.enabled = vidaMax >= 2;
+        corazon3.enabled = vidaMax >= 3;
+    }
+    void LeerMovimiento()
     {
         if (Input.GetKey(KeyCode.A))
         {
@@ -85,14 +104,16 @@ void LeerMovimiento()
 
     void FixedUpdate()
     {
-        cuerpo.velocity = new Vector2(
-            movimiento.x * velocidad,
-            cuerpo.velocity.y
-        );
-        if(saltando)
+        cuerpo.velocity = new Vector2(movimiento.x * velocidad, cuerpo.velocity.y);
+        if (saltando)
         {
-            cuerpo.AddForce(Vector2.up * fuerzaSalto);
+            cuerpo.AddForce(Vector2.up * fuerzaSalto); 
             saltando = false;
+        }
+        if (knockBack != Vector2.zero)
+        {
+            cuerpo.AddForce(knockBack);
+            knockBack = Vector2.zero;
         }
     }
 
@@ -101,6 +122,13 @@ void LeerMovimiento()
         if (Input.GetKeyDown(KeyCode.Space) && !saltando && EstaEnElSuelo())
         {
             saltando = true;
+        }
+    }
+    private void LeerAtaque()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            anim.SetTrigger("Atacar");
         }
     }
 
@@ -117,42 +145,46 @@ void LeerMovimiento()
         }
     }
 
-    private void LeerAtaque()
-    {
-        if (Input.GetKey(KeyCode.F))
-        {
-            anim.SetTrigger("Atacar");
-        }
-        else
-        {
-            anim.ResetTrigger("Atacar");
-        }
-    }
-
     public void RecibeDanno(int cuanto, Vector2 posEnemigo)
     {
-        vida -= cuanto;
-        Debug.Log("Ouch!! Vida restante: " + vida);
-        if (vida <= 0) Destroy(gameObject);
-        Vector2 direccionAtaque = ((Vector2)transform.position) - posEnemigo;
-        direccionAtaque.Normalize();
-        knockBack = direccionAtaque * 250 + 100 * Vector2.up;
-    }
+        vidaRestante -= cuanto;
 
+        ActualizarCorazones();
+
+        if (vidaRestante <= 0) Destroy(gameObject);
+        {
+            Morir();
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Agua"))
         {
-            Morir();
+            vidaMax--;
+
+            ActualizarCorazones();
+
+            if (vidaMax <= 0)
+            {
+                Morir();
+            }
         }
 
         if (collision.CompareTag("Pinchos"))
         {
-            Morir();
+            vidaMax--;
+
+            ActualizarCorazones();
+
+            if (vidaMax <= 0)
+            {
+                Morir();
+            }
         }
 
         if (collision.CompareTag("Meta"))
         {
+            Debug.Log("VICTORIA");
             movimiento = Vector3.zero;
             anim.SetTrigger("Victoria");
 
@@ -164,6 +196,28 @@ void LeerMovimiento()
             Destroy(collision.gameObject);
             monedas++;
             texoMonedas.text = monedas.ToString();
+        }
+
+        if (collision.CompareTag("PezRojo"))
+        {
+            Destroy(collision.gameObject);
+
+            velocidad = velocidadOriginal + 3;
+
+            anim.speed = 2f;
+
+            Invoke(nameof(QuitarVelocidad), 5f);
+        }
+
+        if (collision.CompareTag("PezAzul"))
+        {
+            Destroy(collision.gameObject);
+
+            fuerzaSalto = saltoOriginal + 200;
+
+            anim.speed = 2f;
+
+            Invoke(nameof(QuitarSalto), 5f);
         }
     }
     void MostrarVictoria()
@@ -181,6 +235,28 @@ void LeerMovimiento()
     void MostrarDerrota()
     {
         FindObjectOfType<GanarPerder>().Derrota();
+    }
+
+    void QuitarVelocidad()
+    {
+        velocidad = velocidadOriginal;
+
+        anim.speed = 1f;
+    }
+    void QuitarSalto()
+    {
+        fuerzaSalto = saltoOriginal;
+
+        anim.speed = 1f;
+    }
+    void OnDrawGizmos()
+    {
+        if (EstaEnElSuelo())
+        {
+            Gizmos.color = Color.red;
+        }
+        Gizmos.DrawWireCube(transform.position + Vector3.down * distCaja, tamanoCaja);
+        Gizmos.color = Color.white;
     }
 
 }
