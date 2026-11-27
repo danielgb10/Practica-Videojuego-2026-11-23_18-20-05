@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.SceneManagement;
 
 public class Gato : MonoBehaviour
 {
@@ -12,6 +10,8 @@ public class Gato : MonoBehaviour
     public float velocidad;
     bool saltando;
     public float fuerzaSalto;
+    private float velocidadOriginal;
+    private float saltoOriginal;
     public LayerMask capaSuelo;
     public float distCaja;
     public Vector2 tamanoCaja;
@@ -21,20 +21,18 @@ public class Gato : MonoBehaviour
     SpriteRenderer sprite;
     Animator anim;
 
+
     public int vida = 3;
     private Vector2 knockBack;
-    public Notification notificacion;
-    public int llaves;
-    public TMP_Text textoLlave;
 
     void Start()
     {
-
         movimiento = new Vector3();
         cuerpo = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
-
+        velocidadOriginal = velocidad;
+        saltoOriginal = fuerzaSalto;
     }
 
     void Update()
@@ -42,24 +40,36 @@ public class Gato : MonoBehaviour
         LeerMovimiento();
         LeerSalto();
         ActualizarAnim();
-        LeerAtaque();
-        EstaEnElSuelo();
+        //EstaEnElSuelo();
     }
 
-  private void ActualizarAnim()
+    public int Monedas()
     {
-        if(movimiento.x == 0)
+        return monedas;
+    }
+
+    private void ActualizarAnim()
+    {
+        if (movimiento.x == 0)
         {
             anim.SetBool("Correr", false);
-            
-        } else
+        }
+        else
         {
             anim.SetBool("Correr", true);
+        }
+        if (!EstaEnElSuelo())
+        {
+            anim.SetBool("Saltar", true);
+        }
+        else
+        {
+            anim.SetBool("Saltar", false);
         }
 
     }
 
-    void LeerMovimiento()
+void LeerMovimiento()
     {
         if (Input.GetKey(KeyCode.A))
         {
@@ -76,49 +86,38 @@ public class Gato : MonoBehaviour
             movimiento = Vector3.zero;
         }
     }
-     void LeerSalto()
+
+    void FixedUpdate()
     {
-        if (Input.GetKey(KeyCode.Space))
+        cuerpo.velocity = new Vector2(
+            movimiento.x * velocidad,
+            cuerpo.velocity.y
+        );
+        if(saltando)
         {
-            saltando = true;
-        }
-        else
-        {
+            cuerpo.AddForce(Vector2.up * fuerzaSalto);
             saltando = false;
         }
     }
 
-    void FixedUpdate()
- {
-     cuerpo.velocity = new Vector2(
-         movimiento.x * velocidad,
-         cuerpo.velocity.y
-     );
-     if(saltando)
-     {
-         cuerpo.AddForce(Vector2.up * fuerzaSalto);
-         saltando = false;
-     }
- }
+    void LeerSalto()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && !saltando && EstaEnElSuelo())
+        {
+            saltando = true;
+        }
+    }
 
     bool EstaEnElSuelo()
     {
         RaycastHit2D rc = Physics2D.BoxCast(transform.position, tamanoCaja, 0, Vector2.down, distCaja, capaSuelo);
         if (rc)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-    private void LeerAtaque()
-    {
-        if(Input.GetKeyDown(KeyCode.F))
         {
-            anim.SetTrigger("Atacar");
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -131,30 +130,78 @@ public class Gato : MonoBehaviour
         direccionAtaque.Normalize();
         knockBack = direccionAtaque * 250 + 100 * Vector2.up;
     }
-    
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Moneda"))
+        if (collision.CompareTag("Agua"))
+        {
+            Morir();
+        }
+
+        if (collision.CompareTag("Pinchos"))
+        {
+            Morir();
+        }
+
+        if (collision.CompareTag("Meta"))
+        {
+            Debug.Log("VICTORIA");
+            movimiento = Vector3.zero;
+            anim.SetTrigger("Victoria");
+
+            Invoke(nameof(MostrarVictoria), 2f);
+        }
+
+        if (collision.gameObject.CompareTag("Moneda"))
         {
             Destroy(collision.gameObject);
             monedas++;
             texoMonedas.text = monedas.ToString();
         }
 
-       if (collision.CompareTag("Agua"))
+        if (collision.CompareTag("PezRojo"))
         {
-            anim.SetTrigger("Muere");
+            Destroy(collision.gameObject);
 
-            cuerpo.simulated = false;
+            velocidad = velocidadOriginal + 3;
 
+            Invoke(nameof(QuitarVelocidad), 5f);
         }
 
-        if (collision.CompareTag("Meta"))
+        if (collision.CompareTag("PezAzul"))
         {
-            anim.SetTrigger("Ganar");
-        }
+            Destroy(collision.gameObject);
 
+            fuerzaSalto = saltoOriginal + 200;
+
+            Invoke(nameof(QuitarSalto), 5f);
+        }
+    }
+    void MostrarVictoria()
+    {
+        FindObjectOfType<GanarPerder>().Victoria();
+    }
+    public void Morir()
+    {
+        movimiento = Vector3.zero;
+
+        anim.SetTrigger("Derrota");
+
+        Invoke(nameof(MostrarDerrota), 2f);
+    }
+    void MostrarDerrota()
+    {
+        FindObjectOfType<GanarPerder>().Derrota();
     }
 
-  
+    void QuitarVelocidad()
+    {
+        velocidad = velocidadOriginal;
+    }
+
+    void QuitarSalto()
+    {
+        fuerzaSalto = saltoOriginal;
+    }
+
 }

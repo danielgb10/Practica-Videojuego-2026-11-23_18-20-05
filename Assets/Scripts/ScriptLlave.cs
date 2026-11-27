@@ -6,9 +6,7 @@ using UnityEngine;
 
 public class ScriptLlave : MonoBehaviour
 {
-    private int llave;
-    public TMP_Text textoLlave;
-    public GameObject texto;
+    public GameObject textoLLave;
 
     // Start is called before the first frame update
     void Start()
@@ -22,13 +20,17 @@ public class ScriptLlave : MonoBehaviour
         
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D collision)
+{
+  if (collision.CompareTag("Player"))
     {
-        if (other.CompareTag("Player"))
-        {
-            texto.SetActive(true);
-            Destroy(texto, 2f);
-            Destroy(gameObject);
-        }
-    }   
+        collision.GetComponent<Gato>().tieneLlave = true;
+
+        textoLLave.SetActive(true);
+
+        Destroy(gameObject);
+        Destroy(textoLLave, 2f);
+    }
+}
+
 }
