@@ -50,7 +50,6 @@ public class Gato : MonoBehaviour
         LeerSalto();
         ActualizarAnim();
         //EstaEnElSuelo();
-        LeerAtaque();
     }
 
     public int Monedas()
@@ -80,9 +79,9 @@ public class Gato : MonoBehaviour
     }
     void ActualizarCorazones()
     {
-        corazon1.enabled = vidaMax >= 1;
-        corazon2.enabled = vidaMax >= 2;
-        corazon3.enabled = vidaMax >= 3;
+        corazon1.enabled = vidaRestante >= 1;
+        corazon2.enabled = vidaRestante >= 2;
+        corazon3.enabled = vidaRestante >= 3;
     }
     void LeerMovimiento()
     {
@@ -124,13 +123,6 @@ public class Gato : MonoBehaviour
             saltando = true;
         }
     }
-    private void LeerAtaque()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            anim.SetTrigger("Atacar");
-        }
-    }
 
     bool EstaEnElSuelo()
     {
@@ -145,13 +137,15 @@ public class Gato : MonoBehaviour
         }
     }
 
-    public void RecibeDanno(int cuanto, Vector2 posEnemigo)
+    public void RecibeDanno(int danno)
     {
-        vidaRestante -= cuanto;
+        vidaRestante -= danno;
+        Debug.Log("Vida restante: " + vidaRestante);
+
 
         ActualizarCorazones();
 
-        if (vidaRestante <= 0) Destroy(gameObject);
+        if (vidaRestante <= 0) //Destroy(gameObject);
         {
             Morir();
         }
@@ -160,31 +154,41 @@ public class Gato : MonoBehaviour
     {
         if (collision.CompareTag("Agua"))
         {
-            vidaMax--;
+            vidaRestante--;
 
             ActualizarCorazones();
 
-            if (vidaMax <= 0)
+            if (vidaRestante <= 0)
             {
                 Morir();
             }
+            else
+            {
+                anim.SetTrigger("Hit");
+            }
+
         }
 
         if (collision.CompareTag("Pinchos"))
         {
-            vidaMax--;
+            vidaRestante--;
 
             ActualizarCorazones();
 
-            if (vidaMax <= 0)
+            if (vidaRestante <= 0)
             {
                 Morir();
             }
+            else
+            {
+                anim.SetTrigger("Hit");
+                
+            }
+
         }
 
         if (collision.CompareTag("Meta"))
         {
-            Debug.Log("VICTORIA");
             movimiento = Vector3.zero;
             anim.SetTrigger("Victoria");
 
@@ -224,6 +228,7 @@ public class Gato : MonoBehaviour
     {
         FindObjectOfType<GanarPerder>().Victoria();
     }
+
     public void Morir()
     {
         movimiento = Vector3.zero;
@@ -232,6 +237,7 @@ public class Gato : MonoBehaviour
 
         Invoke(nameof(MostrarDerrota), 2f);
     }
+
     void MostrarDerrota()
     {
         FindObjectOfType<GanarPerder>().Derrota();

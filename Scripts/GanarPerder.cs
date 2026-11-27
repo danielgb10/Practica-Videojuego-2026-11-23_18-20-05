@@ -25,13 +25,19 @@ public class GanarPerder : MonoBehaviour
             FindObjectOfType<Gato>().Monedas();
 
         panelDerrota.SetActive(true);
-        Time.timeScale = 0;
+        Time.timeScale = 1f;
     }
     public void Reiniciar()
     {
         Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+
+    public void SalirAlMenu()
+    {
+        SceneManager.LoadScene("MenuInicio");
+    }
+
     // Start is called before the first frame update
     void Start()
     {
